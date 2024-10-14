@@ -1,0 +1,34 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="14">
+            <item index="0" class="java.lang.String" itemvalue="peft" />
+            <item index="1" class="java.lang.String" itemvalue="rdt" />
+            <item index="2" class="java.lang.String" itemvalue="category_encoders" />
+            <item index="3" class="java.lang.String" itemvalue="zero" />
+            <item index="4" class="java.lang.String" itemvalue="icecream" />
+            <item index="5" class="java.lang.String" itemvalue="kaggle" />
+            <item index="6" class="java.lang.String" itemvalue="prdc" />
+            <item index="7" class="java.lang.String" itemvalue="tomli-w" />
+            <item index="8" class="java.lang.String" itemvalue="ml_collections" />
+            <item index="9" class="java.lang.String" itemvalue="xgboost" />
+            <item index="10" class="java.lang.String" itemvalue="xlrd" />
+            <item index="11" class="java.lang.String" itemvalue="imbalanced-learn" />
+            <item index="12" class="java.lang.String" itemvalue="sdmetrics" />
+            <item index="13" class="java.lang.String" itemvalue="openpyxl" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N803" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
