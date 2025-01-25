@@ -48,25 +48,16 @@ def evaluate_watermark_methods(args, reversed_noise, watermarking_mask, gt_patch
         metric = eval_watermark(reversed_noise, watermarking_mask, gt_patch, args)
     return metric
 def eval_TabWak(reversed_noise, bit_dim=4,k=None):
-    cnt = 0  # Counter for correct bit predictions
+    cnt = 0
     correct = 0
-    q1 = torch.quantile(reversed_noise, 0.25)
-    q2 = torch.quantile(reversed_noise, 0.5)
-    q3 = torch.quantile(reversed_noise, 0.75)
-    shape = reversed_noise.shape
     for i in range(reversed_noise.shape[0]):
-        q1 = torch.quantile(reversed_noise[i], 0.25)
-        q2 = torch.quantile(reversed_noise[i], 0.5)
-        q3 = torch.quantile(reversed_noise[i], 0.75)
+        mid = torch.quantile(reversed_noise[i], 0.5)
+
         for j in range(reversed_noise.shape[1]):
-            if reversed_noise[i][j] <= q1:
+            if reversed_noise[i][j] <= mid:
                 reversed_noise[i][j] = 0
-            elif reversed_noise[i][j] >= q3:
+            else:
                 reversed_noise[i][j] = 1
-            elif reversed_noise[i][j] > q1 and reversed_noise[i][j] < q2:
-                reversed_noise[i][j] = 2
-            elif reversed_noise[i][j] >=q2 and reversed_noise[i][j] < q3:
-                reversed_noise[i][j] = 3
     bsz, seq_len = reversed_noise.shape
     torch.manual_seed(217)
     permutation = torch.randperm(seq_len)
@@ -74,26 +65,18 @@ def eval_TabWak(reversed_noise, bit_dim=4,k=None):
     reversed_noise = reversed_noise[:, inverse_permutation]
     half_dim = seq_len // 2
     for row in reversed_noise:
-        correct_row = 0
         first_half = row[:half_dim]
         last_half = row[half_dim:]
-        # correct_row is the number of bits that first half is as same as the last half
         correct_row = (first_half == last_half).sum().item()
         correct += correct_row
         acc_bit_row = correct_row / half_dim
         wandb.log({f'{k}-acc_bit_row':acc_bit_row})
+        cnt += half_dim
     avg_bit_accuracy = correct / cnt
     return avg_bit_accuracy
-def eval_TabWak_star(reversed_noise, bit_dim=4,k=None):
+def eval_TabWak_star(reversed_noise,k=None):
     cnt = 0
     correct = 0
-    q1 = torch.quantile(reversed_noise, 0.25)
-    print(q1)
-    q2 = torch.quantile(reversed_noise, 0.5)
-    print(q2)
-    q3 = torch.quantile(reversed_noise, 0.75)
-    print(q3)
-    shape = reversed_noise.shape
     for i in range(reversed_noise.shape[0]):
         q1 = torch.quantile(reversed_noise[i], 0.25)
         q2 = torch.quantile(reversed_noise[i], 0.5)
@@ -138,16 +121,13 @@ def eval_TabWak_star(reversed_noise, bit_dim=4,k=None):
     return avg_bit_accuracy
 
 def eval_GS(reversed_noise,k=None):
-    total_elements = reversed_noise.shape[0]*reversed_noise.shape[1] # Total number of elements in the noise
+    total_elements = reversed_noise.shape[0]*reversed_noise.shape[1]
     cnt = 0
-    # for each row, normalize the noise into gaussian distribution with mean 0 and std 1
     reversed_noise = (reversed_noise - reversed_noise.mean()) / reversed_noise.std()
-    # get the random bit sequence of the noise along the row
     torch.manual_seed(217)
     latent_seed = torch.randint(0, 2, reversed_noise.shape[1])
     for row in reversed_noise:
         sign_row = (row > 0).int()
-        # check if the sign of the noise is the same as the latent seed
         cnt_row = (sign_row == latent_seed).sum().item()
         cnt += cnt_row
         acc_bit_row = cnt_row / reversed_noise.shape[1]
@@ -160,26 +140,20 @@ def attack_numpy(attack_type, attack_percentage, X_num, X_cat, X_num_pre, X_cat_
     mask_col = None
     print('Attack:', attack_type)
     if attack_type == 'rowdeletion':
-        # select rows to delete
         num_rows = X_num.shape[0]
         num_rows_delete = int(num_rows * attack_percentage)
         rows_delete = np.random.choice(num_rows, num_rows_delete, replace=False)
-        # delete rows
         X_num = np.delete(X_num, rows_delete, axis=0)
         X_cat = np.delete(X_cat, rows_delete, axis=0)
         if args.with_w == 'treering':
-            # add the random rows from X_num_pre, X_cat_pre to X_num, X_cat to keep the same number of rows
             rows_add = np.random.choice(X_num_pre.shape[0], num_rows_delete, replace=False)
             X_num = np.concatenate([X_num, X_num_pre[rows_add]], axis=0)
             X_cat = np.concatenate([X_cat, X_cat_pre[rows_add]], axis=0)
         else:
-            # Throw an error
             raise ValueError('Attack type not supported')
     elif attack_type == 'coldeletion':
         num_cols = X_num.shape[1]
-        # percentage = 0.05 , delete, 1, percentage=0.1, delete 2, percentage=0.2, delete 3
         num_cols_delete = 1 if attack_percentage == 0.05 else 2 if attack_percentage == 0.1 else 3
-        # check if the number of columns to delete is greater than the number of columns
         if num_cols_delete > num_cols:
             raise ValueError('Number of columns to delete is greater than the number of columns')
         wandb.log({'num_cols_delete':num_cols_delete})
@@ -187,22 +161,16 @@ def attack_numpy(attack_type, attack_percentage, X_num, X_cat, X_num_pre, X_cat_
 
         cols_delete = np.random.choice(num_cols, num_cols_delete, replace=False)
         mask_col = cols_delete
-        # replace the columns with the no w columns
         X_num[:, cols_delete] = X_num_pre[:, cols_delete]
     elif attack_type == 'celldeletion':
-        # select values to delete (Cell Deletion)
         num_values = X_num.shape[0] * X_num.shape[1]
         num_values_delete = int(num_values * attack_percentage)
         values_delete = np.random.choice(num_values, num_values_delete, replace=False)
-        # replace the values with the no w values
         rows_delete = values_delete // X_num.shape[1]
         cols_delete = values_delete % X_num.shape[1]
         X_num[rows_delete, cols_delete] = X_num_pre[rows_delete, cols_delete]
-        #X_cat[rows_delete, cols_delete] = X_cat_pre[rows_delete, cols_delete]
     elif attack_type == 'noise':
-        # get uniform mutipiplier from (1-attack_percentage, 1+attack_percentage)
         multiplier = np.random.uniform(1-attack_percentage, 1+attack_percentage, X_num.shape)
-        # dot product with the original data
         X_num = X_num * multiplier
     return X_num, X_cat, mask_col
 
@@ -256,7 +224,7 @@ def loop(args, i, X_num_pre=None, X_cat_pre=None):
     # get the latent of the synthetic tabular from the vae encoder
     if args.mode == 'watermark':
         pre_keys = ['no-w', 'w']
-        if i in [j for j in range(10,60)]:
+        if i in range(100):
             for k in pre_keys:
                 save_path = f'{save_dir}/{k}-{args.method}.csv'
                 latents = torch.tensor(np.load(f'{save_dir}/{k}-{args.method}.npy')).to(device)
