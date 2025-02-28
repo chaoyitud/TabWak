@@ -1,5 +1,5 @@
 
-#[ICLR 2025] TabWak
+# [ICLR 2025] TabWak
 
 This is the repository for **TabWak**: A watermark for Tabular Diffusion Models.
 
