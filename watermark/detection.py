@@ -4,8 +4,8 @@ import wandb
 import numpy as np
 
 from tabsyn.model import MLPDiffusion, DDIMModel, DDIMScheduler
-from tabsyn.latent_utils import get_input_generate, get_encoder_latent, get_decoder_latent
-from tabsyn.watermark_utils import eval_watermark
+from watermark.latent_utils import get_input_generate, get_encoder_latent, get_decoder_latent
+from watermark.watermark_utils import eval_watermark
 from tabsyn.process_syn_dataset import process_data, preprocess_syn
 
 

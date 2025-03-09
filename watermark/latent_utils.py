@@ -24,7 +24,6 @@ def compute_loss(X_num, X_cat, Recon_X_num, Recon_X_cat, mask_col=None):
 
     for idx, x_cat in enumerate(Recon_X_cat):
         if x_cat is not None:
-            #print("x_cat", x_cat[:10])
             ce_loss += ce_loss_fn(x_cat, X_cat[:, idx])
             x_hat = x_cat.argmax(dim=-1)
         acc += (x_hat == X_cat[:, idx]).float().sum()
@@ -40,7 +39,6 @@ def get_decoder_latent_train(X_num, X_cat, info, device, aux=None, mask_col=None
     # get the encoder latent at first step
     aux = None
     with torch.no_grad():
-
         pre_encoder = info['pre_encoder'].to(device)
         X_num = torch.tensor(X_num).float().to(device)
         X_cat = torch.tensor(X_cat).to(device)
@@ -48,19 +46,6 @@ def get_decoder_latent_train(X_num, X_cat, info, device, aux=None, mask_col=None
         # get latent shape
         latent = latent[:, 1:, :]
         print("latent shape", latent.size())
-        '''
-        if aux is not None:
-            # get the size of the latent
-            B, num_tokens, token_dim = latent.size()
-            recovered_latent = aux.view(B, -1, token_dim)
-
-            # Create a [CLS] token representation as a vector of ones for each batch item
-            #cls_representation = torch.ones(B, 1, token_dim, device=aux.device)
-
-            # Concatenate the [CLS] token back at the beginning of the sequence
-            #latent = torch.cat([cls_representation, recovered_latent], dim=1)
-            latent = recovered_latent
-        '''
     latent.requires_grad = True
     optimizer = torch.optim.Adam([latent], lr=1e-1)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)

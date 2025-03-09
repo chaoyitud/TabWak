@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 import wandb
 from tabsyn.model import MLPDiffusion, Model, DDIMModel, DDIMScheduler
 #from tabsyn.model import BDIA_DDIMScheduler as DDIMScheduler
-from tabsyn.latent_utils import get_input_generate, recover_data, split_num_cat_target, get_encoder_latent
-from watermark_utils import get_watermarking_mask, inject_watermark, get_watermarking_pattern, eval_watermark
+from watermark.latent_utils import get_input_generate, recover_data, split_num_cat_target, get_encoder_latent
+from watermark.watermark_utils import get_watermarking_mask, inject_watermark, get_watermarking_pattern, eval_watermark
 import numpy as np
 
 warnings.filterwarnings('ignore')
