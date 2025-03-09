@@ -11,7 +11,7 @@ import wandb
 from tabsyn.model import MLPDiffusion, Model, DDIMModel, DDIMScheduler
 #from tabsyn.model import BDIA_DDIMScheduler as DDIMScheduler
 from tabsyn.latent_utils import get_input_generate, recover_data, split_num_cat_target, get_encoder_latent
-from tabsyn.watermark_utils import get_watermarking_mask, inject_watermark, get_watermarking_pattern, eval_watermark
+from watermark_utils import get_watermarking_mask, inject_watermark, get_watermarking_pattern, eval_watermark
 import numpy as np
 
 warnings.filterwarnings('ignore')
@@ -40,9 +40,7 @@ def main(args, i):
     in_dim = train_z.shape[1]
     mean = train_z.mean(0)
     denoise_fn = MLPDiffusion(in_dim, 1024).to(device)
-    
-    # Score-based
-    # model = Model(denoise_fn = denoise_fn, hid_dim = train_z.shape[1]).to(device)
+
     # DDIM
     model = DDIMModel(denoise_fn).to(device)
     model.load_state_dict(torch.load(f'{ckpt_path}/model.pt'))
@@ -196,7 +194,7 @@ def main(args, i):
             num_inference_steps=steps,
             eta=0.0)
     
-    if with_w == 'treering' or with_w == 'GS' or with_w == 'GS+' or with_w == 'GS++':
+    if with_w == 'treering' or with_w == 'GS' or with_w == 'TabWak' or with_w == 'TabWak*':
         # DDIM watermark before diffusion
         x_next_2 = noise_scheduler.generate(
                 model.noise_fn,
@@ -206,7 +204,7 @@ def main(args, i):
 
 
     # Saving the synthetic csv
-    x_next_dict = {'no-w': x_next_1, 'w': x_next_2} if with_w == 'treering' or with_w == 'GS'or with_w == 'GS+' or with_w=='GS++' else {'no-w': x_next_1}
+    x_next_dict = {'no-w': x_next_1, 'w': x_next_2} if with_w == 'treering' or with_w == 'GS'or with_w == 'TabWak' or with_w=='TabWak*' else {'no-w': x_next_1}
 
     for k in x_next_dict.keys():
         save_path = f'{save_dir}/{k}-{args.method}.csv'
