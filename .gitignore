@@ -1,0 +1,19 @@
+# Ignore all files and folders under the .idea directory
+.idea/
+jobs/
+# Ignore the workspace file
+*.iws
+data/*
+# Ignore IntelliJ IDEA project files
+*.iml
+*.ipr
+
+# Ignore the compiled files from IntelliJ
+out/
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore any files related to specific run configurations
+run/
