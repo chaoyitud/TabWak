@@ -22,8 +22,25 @@ def get_args():
     parser.add_argument('--method', type=str, default='tabsyn', help='Method: tabsyn or baseline.')
     parser.add_argument('--gpu', type=int, default=0, help='GPU index.')
 
+    parser.add_argument('--save_path', type=str, default=None, help='Path to save synthetic data.')
+    parser.add_argument('--steps', type=int, default=50, help='NFEs.')
+    parser.add_argument('--num_trials', type=int, default=50, help='Number of trials (tables).')
+    parser.add_argument('--exp_prefix', type=str, default=None, help='Experiment prefix.')
 
-    ''' configs for CTGAN '''
+    # configs for watermark
+    parser.add_argument('--with_w', type=str, default='none')
+
+    # TreeRing
+    parser.add_argument('--w_seed', default=999999, type=int)
+    parser.add_argument('--w_channel', default=0, type=int)
+    parser.add_argument('--w_pattern', default='ring')
+    parser.add_argument('--w_mask_shape', default='circle')
+    parser.add_argument('--w_radius', default=100, type=int)
+    parser.add_argument('--w_measurement', default='l1_complex')
+    parser.add_argument('--w_injection', default='complex')
+    parser.add_argument('--w_pattern_const', default=0, type=float)
+
+    #configs for CTGAN
 
     parser.add_argument('-e', '--epochs', default=1000, type=int,
                         help='Number of training epochs')
@@ -129,22 +146,6 @@ def get_args():
     parser.add_argument('--min_beta', type=float, default=1e-5, help='Minimum beta.')
     parser.add_argument('--lambd', type=float, default=0.7, help='Batch size.')
 
-
-    # configs for sampling
-    parser.add_argument('--save_path', type=str, default=None, help='Path to save synthetic data.')
-    parser.add_argument('--steps', type=int, default=50, help='NFEs.')
-    parser.add_argument('--num_trials', type=int, default=50, help='Number of trials.')
-    parser.add_argument('--exp_prefix', type=str, default=None, help='Experiment prefix.')
-    # configs for watermark
-    parser.add_argument('--with_w', type=str, default='none')
-    parser.add_argument('--w_seed', default=999999, type=int)
-    parser.add_argument('--w_channel', default=0, type=int)
-    parser.add_argument('--w_pattern', default='ring')
-    parser.add_argument('--w_mask_shape', default='circle')
-    parser.add_argument('--w_radius', default=100, type=int)
-    parser.add_argument('--w_measurement', default='l1_complex')
-    parser.add_argument('--w_injection', default='complex')
-    parser.add_argument('--w_pattern_const', default=0, type=float)
 
     # configs for attacks
     parser.add_argument('--attack', type=str, default='none', help='Attack types.')
