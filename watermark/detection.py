@@ -24,9 +24,9 @@ def get_watermark_metric(
     num_cols = X_num.shape[1]
 
     # Get the latent of the synthetic tabular from the vae encoder
-    #syn_latent_encoder = get_encoder_latent(X_num, X_cat, info, args.device)
-    #syn_latent = syn_latent_encoder
-    syn_latent = get_decoder_latent(X_num, X_cat, info, args.device, aux=latents, mask_col=mask_col)
+    syn_latent_encoder = get_encoder_latent(X_num, X_cat, info, args.device)
+    syn_latent = syn_latent_encoder
+    #syn_latent = get_decoder_latent(X_num, X_cat, info, args.device, aux=latents, mask_col=mask_col)
     #syn_latent = latents # input saved latents for debugging
 
     mean = mean.to(args.device)
@@ -115,7 +115,7 @@ def eval_TabWak(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=Non
             wandb.log({f'{k}-acc_bit_num': acc_bit_num})
         if cnt_cat != 0:
             wandb.log({f'{k}-acc_bit_cat': acc_bit_cat})
-    avg_bit_accuracy = correct / cnt
+    avg_bit_accuracy = correct / cnt if cnt != 0 else -1
     return avg_bit_accuracy
 
 
@@ -187,7 +187,7 @@ def eval_TabWak_star(reversed_noise, k=None, num_cols=None, token_dim=4, save_di
             wandb.log({f'{k}-acc_bit_num': acc_bit_num})
         if cnt_cat != 0:
             wandb.log({f'{k}-acc_bit_cat': acc_bit_cat})
-    avg_bit_accuracy = correct / cnt
+    avg_bit_accuracy = correct / cnt if cnt != 0 else -1
     return avg_bit_accuracy
 
 
