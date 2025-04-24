@@ -24,16 +24,20 @@ def get_watermark_metric(
     num_cols = X_num.shape[1]
 
     # Get the latent of the synthetic tabular from the vae encoder
-    syn_latent_encoder = get_encoder_latent(X_num, X_cat, info, args.device)
-    syn_latent = syn_latent_encoder
-    #syn_latent = get_decoder_latent(X_num, X_cat, info, args.device, aux=latents, mask_col=mask_col)
+    #syn_latent_encoder = get_encoder_latent(X_num, X_cat, info, args.device)
+    #syn_latent = syn_latent_encoder
+    syn_latent = get_decoder_latent(X_num, X_cat, info, args.device, aux=latents, mask_col=mask_col)
     #syn_latent = latents # input saved latents for debugging
 
     mean = mean.to(args.device)
 
     syn_latent = (syn_latent - mean) / 2
+    # get several row of syn_latent
+    # if there is a row that is all nan, remove it
+    if torch.isnan(syn_latent).all(dim=1).any():
+        print("Row with all NaN values found. Removing them.")
+        syn_latent = syn_latent[~torch.isnan(syn_latent).all(dim=1)]
 
-    # Reverse the noise using DDIM-Inversion
     reversed_noise = noise_scheduler.gen_reverse(
         model.noise_fn, syn_latent, num_inference_steps=args.steps, eta=0.0
     )
@@ -42,6 +46,8 @@ def get_watermark_metric(
     metric_dir = os.path.join(parent_dir, args.exp_prefix)
     if not os.path.exists(metric_dir):
         os.makedirs(metric_dir)
+
+
     metric = evaluate_watermark_methods(args, reversed_noise, watermarking_mask, gt_patch, k, num_cols=num_cols,
                                         save_dir=metric_dir)
     return metric
@@ -115,7 +121,10 @@ def eval_TabWak(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=Non
             wandb.log({f'{k}-acc_bit_num': acc_bit_num})
         if cnt_cat != 0:
             wandb.log({f'{k}-acc_bit_cat': acc_bit_cat})
-    avg_bit_accuracy = correct / cnt if cnt != 0 else -1
+    if cnt != 0:
+        avg_bit_accuracy = correct / cnt
+    else:
+        avg_bit_accuracy = -1
     return avg_bit_accuracy
 
 
@@ -187,7 +196,10 @@ def eval_TabWak_star(reversed_noise, k=None, num_cols=None, token_dim=4, save_di
             wandb.log({f'{k}-acc_bit_num': acc_bit_num})
         if cnt_cat != 0:
             wandb.log({f'{k}-acc_bit_cat': acc_bit_cat})
-    avg_bit_accuracy = correct / cnt if cnt != 0 else -1
+    if cnt != 0:
+        avg_bit_accuracy = correct / cnt
+    else:
+        avg_bit_accuracy = -1
     return avg_bit_accuracy
 
 
