@@ -1,17 +1,19 @@
 # [ICLR 2025 Spotlight] TabWak
-
-We finally cleaned the code.
-
-TODO:
-- [ ] Docker support  
-- [ ] Add pre-trained checkpoints
-
 This is the repository for **TabWak**: A watermark for Tabular Diffusion Models.
 
-The backbone model of TabWak is based on [Tabsyn](https://github.com/amazon-science/tabsyn/tree/main). Therefore, the installation and usage of TabWak are similar to Tabsyn. The following installation steps are based on Tabsyn's instructions.
+We’ve *finally* cleaned the codebase — ready for the world to explore!
+
+---
+
+## 🚧 TODO
+
+- [ ] 🐳 Add Docker support  
+- [ ] 📦 Provide pre-trained checkpoints
+
 
 
 ---
+The backbone model of TabWak is based on [Tabsyn](https://github.com/amazon-science/tabsyn/tree/main). Therefore, the installation and usage of TabWak are similar to Tabsyn. The following installation steps are based on Tabsyn's instructions.
 
 ## 🛠 Installing Dependencies
 
