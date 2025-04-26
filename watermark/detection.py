@@ -70,10 +70,6 @@ def evaluate_watermark_methods(args, reversed_noise, watermarking_mask, gt_patch
 def eval_TabWak(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=None):
     cnt = 0
     correct = 0
-    cnt_num = 0
-    correct_num = 0
-    cnt_cat = 0
-    correct_cat = 0
     reversed_noise_num = reversed_noise[:, :num_cols * token_dim]
     reversed_noise_cat = reversed_noise[:, num_cols * token_dim:]
     for name, reversed_noise in zip(['num', 'cat'], [reversed_noise_num, reversed_noise_cat]):
@@ -88,6 +84,10 @@ def eval_TabWak(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=Non
     for i in range(reversed_noise.shape[0]):
         cnt_row = 0
         correct_row = 0
+        cnt_num = 0
+        correct_num = 0
+        cnt_cat = 0
+        correct_cat = 0
         for name, reversed_noise_split in zip(['num', 'cat'], [reversed_noise_num, reversed_noise_cat]):
             bsz, seq_len = reversed_noise_split.shape
             torch.manual_seed(217)
@@ -131,10 +131,6 @@ def eval_TabWak(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=Non
 def eval_TabWak_star(reversed_noise, k=None, num_cols=None, token_dim=4, save_dir=None):
     cnt = 0
     correct = 0
-    cnt_num = 0
-    correct_num = 0
-    cnt_cat = 0
-    correct_cat = 0
     reversed_noise_num = reversed_noise[:, :num_cols * token_dim]
     reversed_noise_cat = reversed_noise[:, num_cols * token_dim:]
     for name, reversed_noise in zip(['num', 'cat'], [reversed_noise_num, reversed_noise_cat]):
@@ -153,6 +149,10 @@ def eval_TabWak_star(reversed_noise, k=None, num_cols=None, token_dim=4, save_di
                     reversed_noise[i][j] = 3
 
     for i in range(reversed_noise.shape[0]):
+        cnt_num = 0
+        correct_num = 0
+        cnt_cat = 0
+        correct_cat = 0
         cnt_row = 0
         correct_row = 0
         for name, reversed_noise_split in zip(['num', 'cat'], [reversed_noise_num, reversed_noise_cat]):
@@ -191,7 +191,7 @@ def eval_TabWak_star(reversed_noise, k=None, num_cols=None, token_dim=4, save_di
         if cnt_row != 0:
             wandb.log({f'{k}-acc_bit_row': acc_bit_row})
             with open(f'{save_dir}/{k}-detect.json', 'a') as f:
-                f.write(f'{acc_bit_num}\n')
+                f.write(f'{acc_bit_row}\n')
         if cnt_num != 0:
             wandb.log({f'{k}-acc_bit_num': acc_bit_num})
         if cnt_cat != 0:
