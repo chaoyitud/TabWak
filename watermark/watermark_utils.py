@@ -1,7 +1,7 @@
 """
 The implementation of TreeRing is inspired by https://github.com/YuxinWenRick/tree-ring-watermark
 
-The implementation of GaussianShading is inspired by
+The implementation of GaussianShading is inspired by https://github.com/zhaoyu-zhao/GaussianShading
 """
 
 import random
@@ -22,7 +22,6 @@ def set_random_seed(seed=0):
 
 
 def circle_mask(height=17117, width=44, r=10, x_offset=0, y_offset=0):
-    # reference: https://stackoverflow.com/questions/69687798/generating-a-soft-circluar-mask-using-numpy-python-3
     x0 = width // 2
     y0 = height // 2
     x0 += x_offset

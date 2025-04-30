@@ -71,6 +71,9 @@ def get_decoder_latent_train_VAE(X_num, X_cat, info, device, mask_col=None):
 
         loss += punish_loss
         wandb.log({'loss': loss.item()})
+        if not torch.isfinite(loss):
+            #print("Loss is not finite, skipping this step")
+            continue
         loss.backward()
         optimizer.step()
         scheduler.step(loss)
